@@ -17,20 +17,20 @@ public class RazorPaymentGateway implements PaymentGateway{
 		this.razorpayClient= razorpayClient;
 	}
 	@Override
-	public String GeneratePaymentLink(String orderId,String email,String phoneNumber,Long amount) throws RazorpayException {
-
+	public String GeneratePaymentLink(String orderId,String email,String phoneNumber,Long amount) {
+        try {
 		JSONObject paymentLinkRequest = new JSONObject();
 		paymentLinkRequest.put("amount", amount);
 		paymentLinkRequest.put("currency", "INR");
 		paymentLinkRequest.put("accept_partial", false);
 		
-		paymentLinkRequest.put("expire_by", Instant.EPOCH.getEpochSecond()+1800);
+		paymentLinkRequest.put("expire_by", 1706693247/*Instant.EPOCH.getEpochSecond()+1800*/);
 		paymentLinkRequest.put("reference_id", "TS1989");
 		paymentLinkRequest.put("description", "Payment for policy no #23456");
 		JSONObject customer = new JSONObject();
-		customer.put("name", "+919000090000");
+		customer.put("name", phoneNumber);
 		customer.put("contact", "Gaurav Kumar");
-		customer.put("email", "gaurav.kumar@example.com");
+		customer.put("email", email);
 		paymentLinkRequest.put("customer", customer);
 		JSONObject notify = new JSONObject();
 		notify.put("sms", true);
@@ -44,6 +44,11 @@ public class RazorPaymentGateway implements PaymentGateway{
 		paymentLinkRequest.put("callback_method", "get");
 
 		PaymentLink payment = razorpayClient.paymentLink.create(paymentLinkRequest);
-		return "Hi";
+		return payment.toString();
+        }catch(Exception e){
+        	System.out.println(e.toString());
+        	return "Something is wrong";
+        }
 	}
+	
 }
